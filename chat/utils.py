@@ -35,8 +35,13 @@ def when(triggers, user):
         d = t.get('day')
         w = t.get('weekday')
 
+        n = get_next(t)
+        if not n:
+            answers.append('никогда')
+            continue
+
         time_zone = timedelta(hours=user['time_zone'])
-        n = datetime.fromtimestamp(get_next(t)) + time_zone
+        n = datetime.fromtimestamp(n) + time_zone
 
         if w is not None:
             answer = WEEKDAY[n.weekday()]

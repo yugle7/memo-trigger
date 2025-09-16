@@ -235,12 +235,13 @@ def execute(group_id, user, memo, text, question_id):
 
 
 def executes(group_id, user, text):
-    command = get_command(text)
+    words = get_text(text).split()
+    command = get_command(words)
     crons = db.load_crons(group_id)
 
-    title = tg.get_chat(group_id)['title']
+    title = user['group_id'] and tg.get_chat(user['group_id'])['title']
     if not crons:
-        return f'В группе "{title}" сейчас нет напоминаний'
+        return f'В группе "{title}" сейчас нет напоминаний' if title else 'У вас еще нет напоминаний'
 
     if command == 'show':
         return '\n\n'.join(to_answer(cron, user) for cron in crons)
@@ -256,7 +257,7 @@ def executes(group_id, user, text):
                 answers.append(to_answer(cron, user))
 
         if not answers:
-            return f'Напоминания в группе "{title}" и так не показывались'
+            return f'Напоминания в группе "{title}" и так не показывались' if title else 'Ваши напоминания и так не показываются'
 
         db.stop_crons(group_id)
         return '\n\n'.join(answers)
@@ -273,4 +274,4 @@ def executes(group_id, user, text):
 
         return '\n\n'.join(answers)
 
-    return f'Что мне сделать с напоминаниями в группе "{title}"?'
+    return f'Что мне сделать с напоминаниями в группе "{title}"?' if title else 'Что мне сделать с напоминаниями?'

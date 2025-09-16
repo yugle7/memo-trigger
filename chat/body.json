@@ -1,7 +1,7 @@
 {
   "update_id": 597531902,
   "edited_message": {
-    "message_id": 188,
+    "message_id": 226,
     "from": {
       "id": 164671585,
       "is_bot": false,
@@ -19,6 +19,6 @@
     },
     "date": 1758012217,
     "edit_date": 1758012224,
-    "text": "поздравить с 14 февраля!\n10 февраля 23:00"
+    "text": "список"
   }
 }
