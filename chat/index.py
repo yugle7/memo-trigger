@@ -69,55 +69,55 @@ def handle(body):
 
         elif text == '/start':
             if db.create_user(user_id):
-                answer = 'Отлично! Рад вас видеть!\n\nЧтобы заводить здесь напоминания для вашей группы, добавьте меня в ту группу и свяжите меня с ней, отправив туда сообщение @MemoTriggerBot.\n\nПо умолчанию время московское. Если захотите изменить его, то отправьте мне сколько сейчас времени у вас в формате 12:34'
+                answer = 'Отлично! Рад вас видеть!\n\nПо умолчанию напоминания будут показываться здесь. Но если хотите показывать напоминания в какой-нибудь группе, то добавьте меня в нее и свяжите меня с ней, отправив туда сообщение /start.\n\nПо умолчанию время московское. Если захотите изменить его, то отправьте мне сколько сейчас времени у вас в формате 12:34'
             else:
-                answer = 'Привет! Я сейчас не привязан ни к какой группе, давайте привяжемся и начнем заводить напоминания?'
+                answer = 'Привет! О чём вам напомнить?\n\nСейчас вы создаёте личные напоминания, которые будут показываться здесь. Но вы можете привязать меня к какой-нибудь группе, если их нужно показывать там.'
 
         elif re.fullmatch(r'\d+:\d+', text):
             answer = set_time_zone(user_id, text)
 
         else:
             user = db.get_user(user_id)
+            if not user:
+                return 'нет такого пользователя'
 
             group_id = get_group_id(user)
-            if not group_id:
-                answer = 'Сначала свяжите меня с какой-нибудь группой'
-            else:
-                question_id = get_id(chat_id, message_id)
-                reply = message.get('reply_to_message')
-                if reply:
-                    memo = reply.get('text').strip()
-                    if not memo or '\n' in memo:
-                        answer = 'Вы на что-то ответили, но не на напоминание'
-                    else:
-                        answer = execute(group_id, user, memo, text, question_id)
+
+            question_id = get_id(chat_id, message_id)
+            reply = message.get('reply_to_message')
+            if reply:
+                memo = reply.get('text').strip()
+                if not memo or '\n' in memo:
+                    answer = 'Вы на что-то ответили, но не на напоминание'
                 else:
-                    memos = set()
+                    answer = execute(group_id, user, memo, text, question_id)
+            else:
+                memos = set()
 
-                    if '\n' in text:
-                        requests = get_requests(text)
-                        answers = []
-                        for memo, text in requests:
-                            memos.add(memo)
-                            answers.append(execute(group_id, user, memo, text, question_id))
-                        answer = '\n\n'.join(answers)
-                    else:
-                        memo, question = get_request(text)
+                if '\n' in text:
+                    requests = get_requests(text)
+                    answers = []
+                    for memo, text in requests:
                         memos.add(memo)
-                        if memo:
-                            answer = execute(group_id, user, memo, question, question_id)
-                        else:
-                            answer = executes(group_id, user, text)
+                        answers.append(execute(group_id, user, memo, text, question_id))
+                    answer = '\n\n'.join(answers)
+                else:
+                    memo, question = get_request(text)
+                    memos.add(memo)
+                    if memo:
+                        answer = execute(group_id, user, memo, question, question_id)
+                    else:
+                        answer = executes(group_id, user, text)
 
-                    if edited:
-                        cron_ids = {get_id(group_id, memo) for memo in memos}
-                        cron_ids = db.get_cron_ids(question_id) - cron_ids
+                if edited:
+                    cron_ids = {get_id(group_id, memo) for memo in memos}
+                    cron_ids = db.get_cron_ids(question_id) - cron_ids
 
-                        if len(cron_ids) == 1:
-                            db.delete_cron(cron_ids.pop())
+                    if len(cron_ids) == 1:
+                        db.delete_cron(cron_ids.pop())
 
-                        elif len(cron_ids) > 1:
-                            db.delete_crons(cron_ids)
+                    elif len(cron_ids) > 1:
+                        db.delete_crons(cron_ids)
 
     except Exception as err:
         print(err)
@@ -154,9 +154,12 @@ def set_time_zone(user_id, text):
 
 
 def get_group_id(user):
-    if user['group_id'] and not tg.is_admin(user['id'], user['group_id']):
+    if not user['group_id']:
+        return user['id']
+
+    if not tg.is_admin(user['id'], user['group_id']):
         db.reset_user(user['id'])
-        return None
+        return user['id']
 
     return user['group_id']
 

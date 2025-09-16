@@ -100,7 +100,7 @@ def set_group_id(user_id, group_id):
 
 def reset_group_id(user):
     id = user['id']
-    user['group_id'] = user['cron_id'] = None
+    user['group_id'] = None
     execute(f'UPDATE users SET cron_id=NULL, group_id=NULL WHERE id={id};')
 
 

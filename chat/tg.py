@@ -40,6 +40,9 @@ def delete_message(chat_id, message_id):
 
 
 def is_admin(user_id, group_id):
+    if user_id == group_id:
+        return True
+
     url = f'{URL}/bot{TG_BOT_TOKEN}/getChatMember'
     res = requests.post(url, json={
         'chat_id': group_id,
