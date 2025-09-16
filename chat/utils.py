@@ -380,7 +380,7 @@ def get_requests(text):
         requests['i'].append((' '.join(words[i:]), ' '.join(words[:i])))
         requests['j'].append((' '.join(words[:-j]), ' '.join(words[-j:])))
 
-        if i + j < k:
+        if i + j <= k:
             memos.append(text)
         else:
             for memo in memos:
