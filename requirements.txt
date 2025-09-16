@@ -1,0 +1,4 @@
+ydb
+dotenv
+cityhash
+requests

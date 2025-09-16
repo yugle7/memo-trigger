@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Регулярные напоминания</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            border: none;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            --bg-color: var(--tg-theme-bg-color);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans Mono', 'Helvetica Neue', sans-serif, monospace;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 2dvh;
+            line-height: 1.4;
+            word-spacing: 3px;
+            padding: 10px;
+            background-color: var(--bg-color);
+            color: var(--tg-theme-text-color);
+            color-scheme: var(--tg-color-scheme);
+        }
+
+        h1 {
+            font-size: 4dvh;
+            font-weight: 500;
+            line-height: 1.1;
+            padding-top: 15px;
+            padding-bottom: 15px;
+            color: var(--tg-theme-hint-color);
+        }
+
+        h2 {
+            font-size: 3dvh;
+            font-weight: 500;
+            padding-bottom: 10px;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 5px;
+            padding-bottom: 10px;
+        }
+
+        ol {
+            padding-left: 25px;
+            padding-bottom: 10px;
+        }
+
+        ul li::before {
+            content: "–";
+            padding-right: 10px;
+        }
+
+        p {
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <div>
+        <h1>Как начать?</h1>
+        <ol>
+            <li>Создайте личный чат с ботом.</li>
+            <li>
+                Добавьте бота в группу,
+                иначе он не сможет показывать в ней напоминания.
+            </li>
+            <li>
+                В группе отправьте сообщение с упоминанием бота <strong>@MemoTriggerBot</strong>,
+                чтобы бот понял для какой группы показывать напоминания.
+            </li>
+            <li>Создайте напоминание в личном чате с ботом.</li>
+        </ol>
+        <h2>Важно:</h2>
+        <p>
+            Вы должны иметь права администратора в той группе,
+            в которой хотите показывать напоминания.
+        </p>
+        <p>
+            Бот не читает сообщения в группе,
+            поэтому можете не беспокоиться о ваших персональных данных.
+        </p>
+
+        <h1>Как задать расписание?</h1>
+        <ol>
+            <li>
+                Можно указать день недели и время
+                (например: «Доброе утро! понедельник и вторник в 9 часов»).
+            </li>
+            <li>
+                Можно указать день и месяц
+                (например: «С днем рождения Ваня! 17 февраля в 11»).
+            </li>
+            <li>
+                Если день недели не указать,
+                бот будет показывать напоминание каждый день.
+            </li>
+            <li>
+                Бот понимает только ровное количество часов.
+                Не нужно ему указывать минуты.
+            </li>
+        </ol>
+
+        <h2>Примеры:</h2>
+        <p>С днем рождения Ваня! 17 февраля в 11</p>
+        <p>Доброе утро! понедельник и вторник в 9 часов</p>
+        <p>Скоро концерт 2025-10-01 в 20</p>
+
+        <h1>Как остановить или возобновить все регулярные напоминания?</h1>
+        <p>Напишите команду: «останови», «возобнови» или «удали».</p>
+        <p>
+            Если сделать то же самое в ответе на напоминание,
+            то бот выполнит команду только для него.
+        </p>
+
+        <h1>Как остановить или возобновить конкретное напоминание?</h1>
+        <p>
+            Напишите название напоминания и команду: «останови», «возобнови» или «удали».
+            (например: «С днем рождения Ваня! удали»).
+        </p>
+
+        <h1>Как посмотреть все напоминания в группе?</h1>
+        <p>
+            Отправьте сообщение с командой «покажи».
+            И бот покажет расписание всех напоминаний в группе.
+        </p>
+        <p>
+            Если сделать то же самое в ответе на напоминание,
+            то бот покажет расписание только для него.
+        </p>
+
+        <h1>Как поменять группу, для которой показываются напоминания?</h1>
+        <p>
+            Отправьте сообщение с упоминанием бота <strong>@MemoTriggerBot</strong> в новую группу.
+        </p>
+
+        <h1>Как отвязаться от какой-либо группы?</h1>
+        <p>
+            Отправьте в личный чат с ботом сообщение <strong>/start</strong>.
+        </p>
+        <h2>Важно:</h2>
+        <p>
+            Вы также отвяжетесь от группы, если перестанете быть в ней админом.
+        </p>
+    </div>
+</body>
+
+</html>

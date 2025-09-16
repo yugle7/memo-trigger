@@ -1,0 +1,24 @@
+{
+  "update_id": 597531902,
+  "edited_message": {
+    "message_id": 178,
+    "from": {
+      "id": 164671585,
+      "is_bot": false,
+      "first_name": "Gleb",
+      "last_name": "Yuzhakov",
+      "username": "yugle7",
+      "language_code": "ru"
+    },
+    "chat": {
+      "id": 164671585,
+      "first_name": "Gleb",
+      "last_name": "Yuzhakov",
+      "username": "yugle7",
+      "type": "private"
+    },
+    "date": 1758012217,
+    "edit_date": 1758012224,
+    "text": "с днем рождения 12 октября 12"
+  }
+}
