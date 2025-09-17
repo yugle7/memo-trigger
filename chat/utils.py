@@ -335,7 +335,9 @@ def is_action(word):
 
 
 def is_question(word):
-    word = re.sub('[^а-я0-9]', '', word.lower().replace('ё', 'е'))
+    word = re.sub('[^а-я0-9!?]', '', word.lower().replace('ё', 'е'))
+    if not word:
+        return False
     return is_month(word) or word.isdigit() or is_number(word) or is_time(word) or is_weekday(word) or word in VOIDS or is_action(word)
 
 
