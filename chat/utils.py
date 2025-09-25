@@ -132,6 +132,10 @@ def get_command(words):
     return 'change' if any(w.isdigit() for w in words) else ''
 
 
+def is_command(w):
+    return ACTIONS.get(stem(w)) in ('stop', 'resume', 'delete', 'show')
+
+
 def get_text(text):
     text = text.lower().replace('ё', 'е').replace(',', '\n').replace(MENTION, '\n')
     text = re.sub(r':\d+', ' час', text)
@@ -335,7 +339,7 @@ def is_action(word):
 
 
 def is_question(word):
-    word = re.sub('[^а-я0-9!?]', '', word.lower().replace('ё', 'е'))
+    word = re.sub('[^а-я0-9!?"]', '', word.lower().replace('ё', 'е'))
     if not word:
         return False
     return is_month(word) or word.isdigit() or is_number(word) or is_time(word) or is_weekday(word) or word in VOIDS or is_action(word)
@@ -353,20 +357,31 @@ def are_questions(words):
     return i, n - i - j, j
 
 
+def to_memo(words):
+    while words and words[-1] in '.-:|':
+        words.pop()
+
+    return ' '.join(words).removesuffix('"').removeprefix('"').removesuffix(',').removesuffix(':')
+
+
 def get_request(text):
     words = text.split()
-    i, k, j = are_questions(words)
 
-    if i == j == 0:
-        return text, ''
+    if is_command(words[-1]):
+        memo, question = words[:-1], words[-1:]
 
-    if i > j:
-        memo, question = ' '.join(words[i:]), ' '.join(words[:i])
     else:
-        memo, question = ' '.join(words[:-j]), ' '.join(words[-j:])
+        i, k, j = are_questions(words)
 
-    memo = memo.removesuffix(',').removesuffix(':')
-    return memo, question
+        if i == j == 0:
+            memo, question = words, ''
+
+        elif i > j:
+            memo, question = words[i:], words[:i]
+        else:
+            memo, question = words[:-j], words[-j:]
+
+    return to_memo(memo), ' '.join(question)
 
 
 def get_requests(text):
@@ -384,24 +399,27 @@ def get_requests(text):
         words = text.split()
         i, k, j = are_questions(words)
 
-        requests['i'].append((' '.join(words[i:]), ' '.join(words[:i])))
-        requests['j'].append((' '.join(words[:-j]), ' '.join(words[-j:])))
+        requests['i'].append((to_memo(words[i:]), ' '.join(words[:i])))
+        requests['j'].append((to_memo(words[:-j]), ' '.join(words[-j:])))
 
         if i + j <= k:
-            memos.append(text)
+            memos.append(to_memo(words))
         else:
             for memo in memos:
                 requests['k'].append((memo, text))
             memos = []
+
         if i == j == 0 or k == 0:
             counts['k'] += 1
-        elif i > j:
+        elif i > j and not is_command(words[-1]):
             counts['i'] += 1
         else:
             counts['j'] += 1
 
     if counts['k'] >= counts['i'] + counts['j']:
         return requests['k']
+
     if counts['i'] > counts['j']:
         return requests['i']
+
     return requests['j']

@@ -38,7 +38,7 @@ def send_answer(text, chat_id, message_id, edited):
 
 
 def create_memo(cron):
-    tg.send_message(cron['group_id'], cron['memo'])
+    tg.show_message(cron['group_id'], cron['thread_id'], cron['memo'])
 
 
 def handle(body):
@@ -58,11 +58,19 @@ def handle(body):
             if not text or '@' not in text:
                 return 'не ко мне'
 
+            thread_id = message.get('message_thread_id')
+
             if not db.get_user(user_id):
-                tg.send_message(chat_id, 'Сначала заведите личную переписку со мной')
+                tg.show_message(chat_id, thread_id, 'Сначала заведите личную переписку со мной')
                 return 'не узнал'
 
-            answer = mention_in_text(user_id, chat_id)
+            title = message['chat']['title']
+            reply = message.get('reply_to_message')
+            if thread_id and reply:
+                topic = reply['forum_topic_created']['name']
+                title = f'{title} ({topic})'
+
+            answer = mention_in_text(user_id, chat_id, thread_id, title)
 
         elif not text:
             return 'нет текста'
@@ -81,7 +89,7 @@ def handle(body):
             if not user:
                 return 'нет такого пользователя'
 
-            group_id = get_group_id(user)
+            get_where(user)
 
             question_id = get_id(chat_id, message_id)
             reply = message.get('reply_to_message')
@@ -90,7 +98,7 @@ def handle(body):
                 if not memo or '\n' in memo:
                     answer = 'Вы на что-то ответили, но не на напоминание'
                 else:
-                    answer = execute(group_id, user, memo, text, question_id)
+                    answer = execute(user, memo, text, question_id)
             else:
                 memos = set()
 
@@ -99,18 +107,19 @@ def handle(body):
                     answers = []
                     for memo, text in requests:
                         memos.add(memo)
-                        answers.append(execute(group_id, user, memo, text, question_id))
+                        answers.append(execute(user, memo, text, question_id))
                     answer = '\n\n'.join(answers)
                 else:
                     memo, question = get_request(text)
                     memos.add(memo)
                     if memo:
-                        answer = execute(group_id, user, memo, question, question_id)
+                        answer = execute(user, memo, question, question_id)
                     else:
-                        answer = executes(group_id, user, text)
+                        answer = executes(user, text)
 
                 if edited:
-                    cron_ids = {get_id(group_id, memo) for memo in memos}
+                    where_id = get_id(user['group_id'] or user['id'], user['thread_id'])
+                    cron_ids = {get_id(where_id, memo) for memo in memos}
                     cron_ids = db.get_cron_ids(question_id) - cron_ids
 
                     if len(cron_ids) == 1:
@@ -130,13 +139,11 @@ def handle(body):
     return answer
 
 
-def mention_in_text(user_id, group_id):
-    title = tg.get_chat(group_id)['title']
-
+def mention_in_text(user_id, group_id, thread_id, title):
     if not tg.is_admin(user_id, group_id):
         return f'У вас не хватает прав, чтобы создавать напоминания в группе "{title}", станьте сначала в ней администратором'
 
-    db.set_user(user_id, group_id)
+    db.set_where(user_id, group_id, thread_id)
     return f'Теперь вы можете здесь создавать напоминания и задавать время, когда их показывать в группе "{title}"'
 
 
@@ -153,19 +160,16 @@ def set_time_zone(user_id, text):
     return f'Установлен часовой пояс UTC+{time_zone}'
 
 
-def get_group_id(user):
-    if not user['group_id']:
-        return user['id']
-
-    if not tg.is_admin(user['id'], user['group_id']):
-        db.reset_user(user['id'])
-        return user['id']
-
-    return user['group_id']
+def get_where(user):
+    if user['group_id'] and not tg.is_admin(user['id'], user['group_id']):
+        db.reset_where(user)
 
 
-def get_cron(group_id, memo, question_id):
-    cron_id = get_id(group_id, memo)
+def get_cron(user, memo, question_id):
+    group_id = user['group_id'] or user['id']
+    where_id = get_id(group_id, user['thread_id'])
+
+    cron_id = get_id(where_id, memo)
     cron = db.get_cron(cron_id)
     if cron:
         cron['memo'] = memo
@@ -175,15 +179,17 @@ def get_cron(group_id, memo, question_id):
         'id': cron_id,
         'memo': memo,
         'group_id': group_id,
+        'thread_id': thread_id,
         'triggers': [],
         'question_id': question_id
     }
 
 
-def execute(group_id, user, memo, text, question_id):
+def execute(user, memo, text, question_id):
     words = get_text(text).split()
     command = get_command(words)
-    cron = get_cron(group_id, memo, question_id)
+
+    cron = get_cron(user, memo, question_id)
 
     if command == 'resume':
         if not cron['triggers']:
@@ -234,14 +240,21 @@ def execute(group_id, user, memo, text, question_id):
     return f'Что мне сделать с напоминанием "{memo}"?'
 
 
-def executes(group_id, user, text):
+def executes(user, text):
     words = get_text(text).split()
     command = get_command(words)
+
+    group_id = user['group_id'] or user['id']
     crons = db.load_crons(group_id)
 
-    title = user['group_id'] and tg.get_chat(user['group_id'])['title']
+    def where():
+        if user['group_id']:
+            title = tg.get_chat(user['group_id'])['title']
+            return f'В группе {title}'
+        return 'У вас'
+
     if not crons:
-        return f'В группе "{title}" сейчас нет напоминаний' if title else 'У вас еще нет напоминаний'
+        return f'{where()} еще нет напоминаний'
 
     if command == 'show':
         return '\n\n'.join(to_answer(cron, user) for cron in crons)
@@ -257,7 +270,7 @@ def executes(group_id, user, text):
                 answers.append(to_answer(cron, user))
 
         if not answers:
-            return f'Напоминания в группе "{title}" и так не показывались' if title else 'Ваши напоминания и так не показываются'
+            return f'{where()} напоминания и так не показываются'
 
         db.stop_crons(group_id)
         return '\n\n'.join(answers)
@@ -274,4 +287,4 @@ def executes(group_id, user, text):
 
         return '\n\n'.join(answers)
 
-    return f'Что мне сделать с напоминаниями в группе "{title}"?' if title else 'Что мне сделать с напоминаниями?'
+    return 'Что мне сделать с напоминаниями?'

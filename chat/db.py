@@ -94,18 +94,14 @@ def set_time_zone(user_id, time_zone):
     execute(f'UPDATE users SET time_zone={time_zone} WHERE id={user_id};')
 
 
-def set_group_id(user_id, group_id):
-    execute(f'UPDATE users SET cron_id=NULL, group_id={group_id} WHERE id={user_id};')
+def set_where(user_id, group_id, thread_id):
+    execute(f'UPDATE users SET cron_id=NULL, group_id={group_id}, thread_id={thread_id or "NULL"} WHERE id={user_id};')
 
 
-def reset_group_id(user):
+def reset_where(user):
     id = user['id']
-    user['group_id'] = None
-    execute(f'UPDATE users SET cron_id=NULL, group_id=NULL WHERE id={id};')
-
-
-def set_user(id, group_id):
-    execute(f'UPDATE users SET  group_id={group_id} WHERE id={id};')
+    user['group_id'] = user['thread_id'] = None
+    execute(f'UPDATE users SET cron_id=NULL, group_id=NULL, thread_id=NULL WHERE id={id};')
 
 
 def reset_user(id):
@@ -127,12 +123,13 @@ def create_cron(cron):
     triggers = cron['triggers']
     memo = cron['memo']
     group_id = cron['group_id']
+    thread_id = cron['thread_id']
     question_id = cron['question_id']
 
     cron['create'] = create = min(get_next(t) for t in triggers) if triggers else 0
 
-    values = f"({id}, {group_id}, '{memo}', {create}, '{json.dumps(triggers)}', {question_id})"
-    execute(f"INSERT INTO crons (id, group_id, memo, create, triggers, question_id) VALUES {values};")
+    values = f"({id}, {group_id}, {thread_id}, '{memo}', {create}, '{json.dumps(triggers)}', {question_id})"
+    execute(f"INSERT INTO crons (id, group_id, thread_id, memo, create, triggers, question_id) VALUES {values};")
 
 
 def resume_cron(cron, user):
