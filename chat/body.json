@@ -1,7 +1,7 @@
 {
-  "update_id": 597531902,
-  "edited_message": {
-    "message_id": 226,
+  "update_id": 597532012,
+  "message": {
+    "message_id": 646,
     "from": {
       "id": 164671585,
       "is_bot": false,
@@ -11,14 +11,45 @@
       "language_code": "ru"
     },
     "chat": {
-      "id": 164671585,
-      "first_name": "Gleb",
-      "last_name": "Yuzhakov",
-      "username": "yugle7",
-      "type": "private"
+      "id": -1002926785576,
+      "title": "Для моих ботов",
+      "is_forum": true,
+      "type": "supergroup"
     },
-    "date": 1758012217,
-    "edit_date": 1758012224,
-    "text": "напо 23 октября 12"
+    "date": 1758880571,
+    "message_thread_id": 620,
+    "reply_to_message": {
+      "message_id": 620,
+      "from": {
+        "id": 164671585,
+        "is_bot": false,
+        "first_name": "Gleb",
+        "last_name": "Yuzhakov",
+        "username": "yugle7",
+        "language_code": "ru"
+      },
+      "chat": {
+        "id": -1002926785576,
+        "title": "Для моих ботов",
+        "is_forum": true,
+        "type": "supergroup"
+      },
+      "date": 1758655907,
+      "message_thread_id": 620,
+      "forum_topic_created": {
+        "name": "Еще тема",
+        "icon_color": 7322096
+      },
+      "is_topic_message": true
+    },
+    "text": "/start@MemoTriggerBot",
+    "entities": [
+      {
+        "offset": 0,
+        "length": 21,
+        "type": "bot_command"
+      }
+    ],
+    "is_topic_message": true
   }
 }

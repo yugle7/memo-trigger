@@ -95,13 +95,13 @@ def set_time_zone(user_id, time_zone):
 
 
 def set_where(user_id, group_id, thread_id):
-    execute(f'UPDATE users SET cron_id=NULL, group_id={group_id}, thread_id={thread_id or "NULL"} WHERE id={user_id};')
+    execute(f'UPDATE users SET group_id={group_id}, thread_id={thread_id or "NULL"} WHERE id={user_id};')
 
 
 def reset_where(user):
     id = user['id']
     user['group_id'] = user['thread_id'] = None
-    execute(f'UPDATE users SET cron_id=NULL, group_id=NULL, thread_id=NULL WHERE id={id};')
+    execute(f'UPDATE users SET group_id=NULL, thread_id=NULL WHERE id={id};')
 
 
 def reset_user(id):
