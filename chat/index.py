@@ -179,7 +179,7 @@ def get_cron(user, memo, question_id):
         'id': cron_id,
         'memo': memo,
         'group_id': group_id,
-        'thread_id': thread_id,
+        'thread_id': user['thread_id'],
         'triggers': [],
         'question_id': question_id
     }

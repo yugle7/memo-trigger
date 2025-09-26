@@ -123,7 +123,7 @@ def create_cron(cron):
     triggers = cron['triggers']
     memo = cron['memo']
     group_id = cron['group_id']
-    thread_id = cron['thread_id']
+    thread_id = cron['thread_id'] or "NULL"
     question_id = cron['question_id']
 
     cron['create'] = create = min(get_next(t) for t in triggers) if triggers else 0

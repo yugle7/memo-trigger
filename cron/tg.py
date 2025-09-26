@@ -15,13 +15,10 @@ def escape(text):
     return re.sub(r'([:_~*\[\]()>#+-={}|.!])', r'\\\1', text)
 
 
-def send_message(chat_id, text):
+def show_message(chat_id, thread_id, text):
     url = f'{URL}/bot{TG_BOT_TOKEN}/sendMessage'
     data = {'chat_id': chat_id, 'text': escape(text), 'parse_mode': 'MarkdownV2'}
+    if thread_id:
+        data['message_thread_id'] = thread_id
 
-    res = requests.post(url, json=data)
-    if not res.ok:
-        return None
-    res = res.json().get('result')
-    return res and res.get('message_id')
-
+    requests.post(url, json=data)

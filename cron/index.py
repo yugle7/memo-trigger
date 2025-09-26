@@ -4,7 +4,7 @@ from time import time
 
 
 def create_memo(cron):
-    tg.send_message(cron['group_id'], cron['memo'])
+    tg.show_message(cron['group_id'], cron['thread_id'], cron['memo'])
     cron['create'] = int(time())
     db.update_next(cron)
 
