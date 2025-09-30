@@ -38,7 +38,4 @@ def get_next(trigger):
         else:
             t += timedelta(days=1)
 
-    if m and t.month != m:
-        return 0
-
-    return int((t - time_zone).timestamp())
+    return int((t - time_zone).timestamp()) if t > now else 0

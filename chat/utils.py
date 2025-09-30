@@ -90,6 +90,13 @@ def get_next(trigger):
         elif t <= now:
             t += timedelta(days=7)
 
+    elif 'days' in trigger:
+        t += timedelta(days=trigger.pop('days'))
+
+        trigger['day'] = t.day
+        trigger['month'] = t.month
+        trigger['year'] = t.year
+
     elif t <= now:
         if y and m and d:
             return 0
@@ -104,10 +111,7 @@ def get_next(trigger):
         else:
             t += timedelta(days=1)
 
-    if m and t.month != m:
-        return 0
-
-    return int((t - time_zone).timestamp())
+    return int((t - time_zone).timestamp()) if t > now else 0
 
 
 class Token:
@@ -187,32 +191,35 @@ def get_triggers(words):
     h = H()
     k = ''.join(t.k for t in tokens)
 
-    for m in re.finditer('w|nmN?|d|nh?', k):
+    for m in re.finditer('w|nmN?|d|D|nh?', k):
         i, j = m.span()
+        t = tokens[i]
 
         if m[0] in ('n', 'nh'):
-            hour = tokens[i].v
+            hour = t.v
             if hour >= 24:
                 return []
             h.add({'hour': hour})
         elif m[0] == 'w':
-            h.add({'weekday': tokens[i].v})
+            h.add({'weekday': t.v})
         elif m[0] == 'nmN':
             h.add({
-                'day': tokens[i].v,
+                'day': t.v,
                 'month': tokens[i + 1].v,
                 'year': tokens[i + 2].v
             })
         elif m[0] == 'nm':
             h.add({
-                'day': tokens[i].v,
+                'day': t.v,
                 'month': tokens[i + 1].v,
             })
+        elif m[0] == 'D':
+            h.add({'days': t.v})
         elif m[0] == 'd':
             h.add({
-                'day': tokens[i].v[0],
-                'month': tokens[i].v[1],
-                'year': tokens[i].v[2]
+                'day': t.v[0],
+                'month': t.v[1],
+                'year': t.v[2]
             })
 
     return list(h.get())
@@ -236,6 +243,8 @@ def get_tokens(words):
 
 
 def get_date(words, i):
+    if words[i] in DAYS:
+        return Token('D', DAYS.index(words[i]))
     m = re.fullmatch(r'(\d\d\d\d)-(\d\d?)-(\d\d?)', words[i])
     return m and Token('d', (int(m[3]), int(m[2]), int(m[1])))
 
@@ -342,7 +351,7 @@ def is_question(word):
     word = re.sub('[^а-я0-9!?"]', '', word.lower().replace('ё', 'е'))
     if not word:
         return False
-    return is_month(word) or word.isdigit() or is_number(word) or is_time(word) or is_weekday(word) or word in VOIDS or is_action(word)
+    return is_month(word) or word.isdigit() or is_number(word) or is_time(word) or is_weekday(word) or word in VOIDS or is_action(word) or word in DAYS
 
 
 def are_questions(words):
@@ -402,7 +411,7 @@ def get_requests(text):
         requests['i'].append((to_memo(words[i:]), ' '.join(words[:i])))
         requests['j'].append((to_memo(words[:-j]), ' '.join(words[-j:])))
 
-        if i + j <= k:
+        if i + j <= k or not memos:
             memos.append(to_memo(words))
         else:
             for memo in memos:
