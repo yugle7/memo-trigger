@@ -30,7 +30,14 @@ const SECTION = document.getElementById("section");
 
 let data = {};
 
-function addOptions(form, chat = null) {
+function addOptions(form, chat = null, time_zone = null) {
+  if (chat === null && forms.children.length > 1) {
+    const f = forms.lastElementChild;
+    time_zone = f.querySelector('input[name="time_zone"]').value;
+    chat = f.querySelector('input[name="chat"]').value;
+    form.querySelector('input[name="time_zone"]').value = time_zone;
+  }
+
   const options = form.querySelector('select[name="chat"]');
   data.chats.forEach((c) => {
     const option = document.createElement("option");
@@ -42,12 +49,6 @@ function addOptions(form, chat = null) {
     }
     options.appendChild(option);
   });
-  if (forms.children.length) {
-    form.querySelector('input[name="time_zone"]').value =
-      forms.lastElementChild.querySelector('input[name="time_zone"]').value;
-    form.querySelector('input[name="chat"]').value =
-      forms.lastElementChild.querySelector('input[name="chat"]').value;
-  }
 }
 
 (async function () {
@@ -60,16 +61,14 @@ function addOptions(form, chat = null) {
   data.forms.forEach((f) => {
     const form = FORM.content.cloneNode(true).firstElementChild;
 
-    addOptions(form, f.chat);
+    addOptions(form, f.chat || "", f.time_zone);
 
-    form.querySelector('input[name="chat"]').value = f.chat || "";
     form.querySelector('input[name="day"]').value = f.day || "";
     form.querySelector('input[name="month"]').value = f.month || "";
     form.querySelector('input[name="year"]').value = f.year || "";
     form.querySelector('input[name="when"]').value = f.when || "";
     form.querySelector('input[name="what"]').value = f.what || "";
     form.querySelector('input[name="id"]').value = f.id;
-    form.querySelector('input[name="time_zone"]').value = f.time_zone;
     form.querySelector('input[name="stop"]').checked = f.stop;
 
     form.lastElementChild.lastElementChild.onclick = delForm;
