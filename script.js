@@ -15,9 +15,9 @@ let checkDataString = Array.from(params.entries())
 
 let url = new URL("https://functions.yandexcloud.net/d4en97iqd5o074raaah5");
 
-// user = { id: 164671585 };
-// hash = "";
-// checkDataString = "";
+user = { id: 164671585 };
+hash = "";
+checkDataString = "";
 
 url.searchParams.set("user_id", user["id"]);
 url.searchParams.set("hash", hash);
@@ -30,13 +30,8 @@ const SECTION = document.getElementById("section");
 
 let data = {};
 
-function addOptions(form, chat = null, time_zone = null) {
-  if (chat === null && forms.children.length > 1) {
-    const f = forms.lastElementChild;
-    time_zone = f.querySelector('input[name="time_zone"]').value;
-    chat = f.querySelector('input[name="chat"]').value;
-    form.querySelector('input[name="time_zone"]').value = time_zone;
-  }
+function addOptions(form, chat = "", time_zone = 3) {
+  form.querySelector('input[name="time_zone"]').value = time_zone;
 
   const options = form.querySelector('select[name="chat"]');
   data.chats.forEach((c) => {
