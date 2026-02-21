@@ -42,6 +42,12 @@ function addOptions(form, chat = null) {
     }
     options.appendChild(option);
   });
+  if (forms.children.length) {
+    form.querySelector('input[name="time_zone"]').value =
+      forms.lastElementChild.querySelector('input[name="time_zone"]').value;
+    form.querySelector('input[name="chat"]').value =
+      forms.lastElementChild.querySelector('input[name="chat"]').value;
+  }
 }
 
 (async function () {
@@ -50,13 +56,13 @@ function addOptions(form, chat = null) {
     return;
   }
   data = await res.json();
-  let time_zone = "3";
 
   data.forms.forEach((f) => {
     const form = FORM.content.cloneNode(true).firstElementChild;
 
     addOptions(form, f.chat);
 
+    form.querySelector('input[name="chat"]').value = f.chat || "";
     form.querySelector('input[name="day"]').value = f.day || "";
     form.querySelector('input[name="month"]').value = f.month || "";
     form.querySelector('input[name="year"]').value = f.year || "";
@@ -64,7 +70,6 @@ function addOptions(form, chat = null) {
     form.querySelector('input[name="what"]').value = f.what || "";
     form.querySelector('input[name="id"]').value = f.id;
     form.querySelector('input[name="time_zone"]').value = f.time_zone;
-    time_zone = f.time_zone;
     form.querySelector('input[name="stop"]').checked = f.stop;
 
     form.lastElementChild.lastElementChild.onclick = delForm;
@@ -72,7 +77,6 @@ function addOptions(form, chat = null) {
   });
 
   const form = FORM.content.cloneNode(true).firstElementChild;
-  form.querySelector('input[name="time_zone"]').value = time_zone;
   addOptions(form);
 
   form.onclick = addForm;
