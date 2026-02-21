@@ -4,9 +4,9 @@ from time import time
 
 
 def create_memo(cron):
-    tg.show_message(cron['group_id'], cron['thread_id'], cron['memo'])
-    cron['create'] = int(time())
-    db.update_next(cron)
+    tg.show_message(cron["group_id"], cron["thread_id"], cron["memo"])
+    cron["create"] = int(time())
+    db.update_when(cron)
 
 
 def handler(event=None, context=None):
@@ -14,4 +14,4 @@ def handler(event=None, context=None):
     for c in crons:
         create_memo(c)
 
-    return {'statusCode': 200, 'body': 'ok'}
+    return {"statusCode": 200, "body": "ok"}

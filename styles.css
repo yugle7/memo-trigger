@@ -1,0 +1,194 @@
+* {
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Roboto", "Helvetica", system-ui, sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.5;
+  word-spacing: 3px;
+  background-color: var(--acent-color);
+  color: var(--text-color);
+  color-scheme: var(--tg-color-scheme, "dark");
+}
+strong {
+  font-weight: 400;
+  color: var(--acent-color);
+}
+
+h2 {
+  font-size: 3dvh;
+  font-weight: 500;
+}
+
+section {
+  position: relative;
+  width: 100%;
+  margin: 20px 0;
+}
+section label {
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  background: var(--form-color);
+  padding: 0 4px;
+  font-size: 12px;
+  color: var(--acent-color);
+  pointer-events: none;
+  z-index: 1;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid var(--line-color);
+  border-radius: 10px;
+  color: var(--text-color);
+  font-size: 16px;
+  background-color: var(--form-color);
+  outline: none;
+  vertical-align: middle;
+}
+
+input:hover,
+input:focus {
+  border: 1px solid var(--acent-color);
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  appearance: textfield;
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+section input:placeholder-shown + label {
+  display: none;
+}
+
+.delete {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 40px;
+  height: 40px;
+  font-size: 30px;
+  line-height: 40px;
+  vertical-align: middle;
+  color: var(--text-color);
+  opacity: 0.7;
+
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.delete:hover {
+  opacity: 1;
+}
+
+.who > :last-child .delete,
+#forms > :last-child label ~ .delete,
+#forms > :last-child .buttons {
+  display: none;
+}
+
+#forms {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+form {
+  width: 100%;
+  margin: 0 auto;
+  padding: 15px;
+  padding-bottom: 40px;
+  background-color: var(--form-color);
+}
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+h2,
+p > span {
+  color: var(--acent-color);
+}
+h2 {
+  padding-bottom: 15px;
+  font-size: 28px;
+  text-align: center;
+}
+p {
+  font-size: 18px;
+  padding-bottom: 10px;
+}
+
+#forms > div {
+  background-color: var(--form-color);
+  padding: 15px;
+}
+
+form {
+  transition: opacity 0.3s ease;
+}
+
+input[name="stop"] {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+form:has(input[name="stop"]:checked) {
+  opacity: 0.9;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  opacity: 0.5;
+  padding: 0 15px;
+}
+
+.text::before {
+  content: "Остановить";
+}
+
+input[name="stop"]:checked + .text::before {
+  content: "Запустить";
+}
+
+.buttons button {
+  background-color: var(--form-color);
+  color: var(--text-color);
+  visibility: hidden;
+  outline: none;
+  font-size: 16px;
+}
+
+.buttons:has(input[name="stop"]:checked) button {
+  visibility: visible;
+}

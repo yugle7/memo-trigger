@@ -1,189 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <title>Регулярные напоминания</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Регулярное создание опросов</title>
     <style>
-        * {
-            padding: 0;
-            margin: 0;
-            border: none;
-        }
-
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-        }
-
-        body {
-            --bg-color: var(--tg-theme-bg-color);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans Mono', 'Helvetica Neue', sans-serif, monospace;
-            font-style: normal;
-            font-weight: 400;
-            font-size: 2.5dvh;
-            line-height: 1.5;
-            word-spacing: 3px;
-            padding: 10px;
-            background-color: var(--bg-color);
-            color: var(--tg-theme-text-color);
-            color-scheme: var(--tg-color-scheme);
-        }
-        strong {
-            font-weight: 400;
-            color: var(--tg-theme-link-color);
-        }
-
-        h1 {
-            font-size: 4dvh;
-            font-weight: 500;
-            line-height: 1.1;
-            padding-top: 15px;
-            padding-bottom: 15px;
-            color: var(--tg-theme-hint-color);
-        }
-
-        h2 {
-            font-size: 3dvh;
-            font-weight: 500;
-            padding-bottom: 10px;
-        }
-
-        ul {
-            list-style: none;
-            padding-left: 5px;
-            padding-bottom: 10px;
-        }
-
-        ol {
-            padding-left: 25px;
-            padding-bottom: 10px;
-        }
-
-        ul li::before {
-            content: "–";
-            padding-right: 10px;
-            line-height: 1.8;
-        }
-
-        p {
-            padding-bottom: 10px;
-        }
+      :root {
+        --bg-color: var(--tg-theme-secondary-bg-color, rgb(10, 10, 10));
+        --form-color: var(--tg-theme-bg-color, rgb(30, 30, 30));
+        --acent-color: var(--tg-theme-button-color, rgb(135, 116, 225));
+        --text-color: var(--tg-theme-text-color, rgb(200, 200, 200));
+        --hint-color: var(--tg-theme-hint-color, rgb(50, 50, 50));
+        --line-color: color-mix(in srgb, var(--text-color) 25%, transparent);
+      }
     </style>
-</head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
 
-<body>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <body>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<div>
-    <h1>Как начать?</h1>
-    <ol>
-        <li>
-            Создайте личный чат с ботом.
-            Нажмите на кнопку <strong>/start</strong>.
-        </li>
-        <li>
-            Задайте часовой пояс, так как бот не имеет прямого доступа к вашему времени.
-            Для этого отправьте ваше время в формате <strong>12:34</strong>.
-            По умолчанию время московское — часовой пояс <strong>UTC+3</strong>.
-            В любой момент вы можете поменять свой часовой пояс.
-        </li>
-        <li>
-            Если хотите показывать напоминания в группе, то добавьте бота в нее
-            и отправьте туда команду <strong>/start</strong> для бота <strong>@MemoTriggerBot</strong>,
-            чтобы он понял куда показывать ваши напоминания.
-        </li>
-        <li>
-            Создайте напоминание в личном чате с ботом.
-        </li>
-    </ol>
-    <h2>Важно:</h2>
-    <p>
-        Вы должны иметь права администратора в той группе,
-        в которой хотите показывать напоминания.
-    </p>
-    <p>
-        Бот не читает сообщения в группе,
-        поэтому можете не беспокоиться о ваших персональных данных.
-    </p>
+    <template id="form">
+      <form>
+        <input type="text" name="id" hidden />
+        <section>
+          <select name="chat" required>
+            <option value="">Лично</option>
+          </select>
+          <label for="chat">Чат</label>
+        </section>
+        <section>
+          <input
+            type="number"
+            name="time_zone"
+            value="3"
+            required
+            placeholder="Часовой пояс"
+          />
+          <label for="time_zone">Часовой пояс</label>
+        </section>
+        <section>
+          <input type="number" name="day" placeholder="День" />
+          <label for="day">День</label>
+        </section>
+        <section>
+          <input type="number" name="month" placeholder="Месяц" />
+          <label for="month">Месяц</label>
+        </section>
+        <section>
+          <input type="number" name="year" placeholder="Год" />
+          <label for="year">Год</label>
+        </section>
+        <section>
+          <input type="text" name="when" placeholder="Когда" />
+          <label for="when">Когда</label>
+        </section>
+        <section>
+          <input type="text" name="what" placeholder="Что" />
+          <label for="what">Что</label>
+        </section>
 
-    <h1>Как задать расписание?</h1>
-    <ol>
-        <li>
-            Для еженедельных опросов, нужно указать день недели и время
-            (например: «Доброе утро! Понедельник и вторник в 9 часов»).
-        </li>
-        <li>
-            Можно указать день, месяц и время,
-            тогда опрос будет срабатывать ежегодно
-            (например: «С днем рождения! 17 февраля в 11»).
-        </li>
-        <li>
-            Если указать точную дату, то опрос сработает один раз
-            (например: «Скоро концерт! 17 дек 2026 в 19»).
-        </li>
-        <li>
-            Если же указать только время, то
-            бот будет показывать напоминание каждый день
-            (например: «С добрым утром! В 10 часов»).
-        </li>
-    </ol>
+        <div class="buttons">
+          <label>
+            <input type="checkbox" name="stop" />
+            <span class="text"></span>
+          </label>
+          <button type="button">Удалить</button>
+        </div>
+      </form>
+    </template>
 
-    <h2>Важно:</h2>
-    <p>
-        Бот понимает только ровное количество часов,
-        из-за экономии ресурсов.
-        Не нужно ему указывать минуты.
-    </p>
+    <div id="forms">
+      <div>
+        <h2>Напоминания</h2>
+        <p>
+          <span>Чат</span> — в каком чате будет создаваться опрос. Это может
+          быть как группа, так и ее топик.
+        </p>
+        <p>
+          Вы должны быть админом той группы, добавить в нее бота и отправить
+          команду <span>/attach</span>. Так бот запомнит, что вы можете
+          создавать в ней опросы.
+        </p>
+        <p>
+          Команда <span>/detach</span> уберет из вариантов выбора тот чат. Но
+          предварительно убедитесь, что вы больше не создаете опросов в нем.
+        </p>
+        <p>
+          <span>Когда</span> — когда будет приходить напоминание. В этом поле
+          можно указать время в формате <span>20:00</span>. И дополнительно
+          можно указать день недели, например, <span>Пн 20:00</span>.
+        </p>
+        <p>Если не указать время, то напоминание не будет создаваться.</p>
+        <p>Можно не указывать день, месяц или год.</p>
+      </div>
+    </div>
 
-    <h2>Примеры:</h2>
-    <ul>
-        <li>купить подарок жене! 10 фев в 9</li>
-        <li>на тренировку пн вт в 9 часов</li>
-        <li>пройти медосмотр 2025-10-01 в 20</li>
-    </ul>
-
-    <h1>Как остановить или возобновить все регулярные напоминания?</h1>
-    <p>Напишите команду: «останови», «возобнови» или «удали».</p>
-    <p>
-        Если сделать то же самое в ответе на напоминание,
-        то бот выполнит команду только для него.
-    </p>
-
-    <h1>Как остановить или возобновить конкретное напоминание?</h1>
-    <p>
-        Напишите название напоминания и команду: «останови», «возобнови» или «удали».
-        (например: «С днем рождения Ваня! Удали»).
-    </p>
-
-    <h1>Как посмотреть все напоминания в группе?</h1>
-    <p>
-        Отправьте сообщение с командой «покажи».
-        И бот покажет расписание всех напоминаний в группе.
-    </p>
-    <p>
-        Если сделать то же самое в ответе на напоминание,
-        то бот покажет расписание только для него.
-    </p>
-
-    <h1>Как поменять группу, для которой показываются напоминания?</h1>
-    <p>
-        Отправьте команду <strong>/start</strong> для бота <strong>@MemoTriggerBot</strong> в новую группу.
-    </p>
-    <p>
-        Если отправить команду <strong>/start</strong> в личный чат с ботом,
-        то вообще отвяжетесь от какой-либо группы.
-    </p>
-    <h2>Важно:</h2>
-    <p>
-        Вы также отвяжетесь от группы, если перестанете быть в ней админом.
-    </p>
-</div>
-</body>
-
+    <script src="script.js"></script>
+  </body>
 </html>
